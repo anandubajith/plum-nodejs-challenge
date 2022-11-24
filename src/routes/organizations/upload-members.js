@@ -5,7 +5,7 @@ const ajv = new Ajv({ allErrors: true })
 import csv from 'async-csv'
 
 addErrors(ajv)
-addFormats(ajv, ["email"])
+addFormats(ajv, ['email'])
 
 const csvSchema = {
     type: "array",
