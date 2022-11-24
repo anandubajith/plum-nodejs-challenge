@@ -4,16 +4,14 @@ import multipart from '@fastify/multipart'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 
-function ajvPlugin(ajv, options) {
+function ajvPlugin(ajv, _options) {
     ajv.addKeyword('isFileType', {
-        compile: (schema, parent, it) => {
-            // Change the schema type, as this is post validation it doesn't appear to error.
+        compile: (_schema, parent, _it) => {
             parent.type = 'file'
             delete parent.isFileType
             return () => true
-        },
+        }
     })
-
     return ajv
 }
 
@@ -21,7 +19,6 @@ try {
     const fastify = Fastify({ logger: true, ajv: { plugins: [ajvPlugin] } })
     const __filename = fileURLToPath(import.meta.url)
     const __dirname = dirname(__filename)
-
 
     fastify.addSchema({
         $id: 'organization',
