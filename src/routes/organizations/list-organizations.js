@@ -56,7 +56,8 @@ export default async function(app, _opts) {
                             )
                         FROM members m where m."organization_id" = o.id
                     ) as members
-                FROM organizations o OFFSET $1 LIMIT $2
+                FROM organizations o
+                ORDER BY o.id OFFSET $1 LIMIT $2
             `, [offset, size]);
             reply.code(200).send({ success: true, organizations: rows });
         } catch (e) {
