@@ -47,25 +47,28 @@ const csvSchema = {
                 enum: ['male', 'female', 'other'],
                 errorMessage: `gender is required and must be 'male, 'female', or 'other'`
             }
-        },
-        additionalProperties: false,
+        }
     }
 }
 
 const validate = ajv.compile(csvSchema)
 
 const updateRow = async (app, orgId, row) => {
-
-    const query = `INSERT INTO
-                    members ("organization_id", "employee_id", "first_name", "middle_name", "last_name", "email", "date_of_birth", "gender")
-                    VALUES($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT ("organization_id", "employee_id") DO NOTHING`
-    const { rowCount } = await app.pg.query(query, [
-        orgId,
-        row.employee_id, row.first_name, row.middle_name,
-        row.last_name, row.email, row.date_of_birth, row.gender
-    ])
-    //todo: insert error?
-    // constraint violation?
+    try {
+        const query = `INSERT INTO
+                        members ("organization_id", "employee_id", "first_name", "middle_name", "last_name", "email", "date_of_birth", "gender")
+                        VALUES($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT ("organization_id", "employee_id")`
+        const { rowCount } = await app.pg.query(query, [
+            orgId,
+            row.employee_id, row.first_name, row.middle_name,
+            row.last_name, row.email, row.date_of_birth, row.gender
+        ])
+        if (rowCount != 1) throw Error("Insert failed")
+        return ''
+    } catch (e) {
+        console.error(e);
+        return `row = ${row.csv_row} error = Failed to insert`
+    }
 }
 
 export default async function(app, _opts) {
@@ -138,8 +141,12 @@ export default async function(app, _opts) {
                 columns: ['employee_id', 'first_name', 'middle_name', 'last_name', 'email', 'date_of_birth', 'gender']
             })
 
-            // hack: to remove middle_name='' entry from the object for easier validation
-            for ( let row of rows) if ( !row['middle_name']) delete row['middle_name']
+            for (let [index, row] of rows.entries()) {
+                row['csv_row'] = index;
+                // hack: to remove middle_name='' entry from the object for easier validation
+                if (!row['middle_name']) delete row['middle_name']
+            }
+
 
             validate(rows)
             const ajvErrorList = validate.errors ?? []
@@ -156,7 +163,10 @@ export default async function(app, _opts) {
             const updatePromises = rows.filter((_, index) => !errorIndices.has(index))
                 .map(row => updateRow(app, request.params.orgId, row))
 
-            await Promise.all(updatePromises)
+            // get errors during insert, and add the non empty ones
+            const responses = await Promise.all(updatePromises)
+            errorsList.push(...responses.filter(r => !!r))
+
             await app.pg.query('COMMIT')
             reply.code(201).send({
                 success: true,
