@@ -1,4 +1,7 @@
 Employee ID,First Name,Middle Name,Last Name,Email ID,Date of Birth,Gender
-1,Richard,Jes,Hendricks,richard.h@gmail.com,01/09/1998,male
-2,,,Hendricks,,01/09/1998,male
-3,Elrich,,Bachman,elrich@gmail.com,01/09/1998,male
+1,Richard,,Hendricks,richard.hendricks@gmail.com,01/09/1998,male
+2,Nelson,Big Head,Bighetti,nelson@stanford.edu,09/09/1998,male
+3,Bertram,,Gilfoyle,bertam@asdf.in,11/11/1945,male
+4,Monica,,Hall,monica@adsf.in,12/12/2004,female
+5,,,,asdf,12/1/1234,male
+6,test,test,test,test@asdf.in,01/01/1999,other
