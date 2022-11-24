@@ -109,7 +109,7 @@ export default async function(app, _opts) {
                 properties: { file: { isFileType: true } }
             },
             response: {
-                200: {
+                201: {
                     type: 'object',
                     description: 'Success response',
                     properties: {
