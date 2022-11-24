@@ -12,4 +12,3 @@
 - [Fastify](https://www.fastify.io/)
 - PostgreSQL
 
-date column, do update

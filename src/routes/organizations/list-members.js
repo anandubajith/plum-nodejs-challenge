@@ -37,7 +37,9 @@ export default async function(app, _opts) {
             const size = Math.max(1, request.query.size ?? 5);
             const offset = page * size;
             const { rows } = await app.pg.query(`
-                SELECT * FROM members WHERE "organization_id" = $1 OFFSET $2 LIMIT $3
+                SELECT m.*, to_char(m.date_of_birth, 'DD/MM/YYYY') as date_of_birth
+                    FROM members m
+                    WHERE "organization_id" = $1 OFFSET $2 LIMIT $3
             `, [request.params.orgId, offset, size])
             return reply.code(200).send({success: true, members: rows});
         } catch (e) {

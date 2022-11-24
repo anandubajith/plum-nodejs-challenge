@@ -57,7 +57,7 @@ const updateRow = async (app, orgId, row) => {
     try {
         const query = `INSERT INTO
                         members ("organization_id", "employee_id", "first_name", "middle_name", "last_name", "email", "date_of_birth", "gender")
-                        VALUES($1, $2, $3, $4, $5, $6, $7, $8) ON CONFLICT ("organization_id", "employee_id") DO NOTHING`
+                        VALUES($1, $2, $3, $4, $5, $6, to_date($7, 'DD/MM/YYYY'), $8) ON CONFLICT ("organization_id", "employee_id") DO NOTHING`
         const { rowCount } = await app.pg.query(query, [
             orgId,
             row.employee_id, row.first_name, row.middle_name,
