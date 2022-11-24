@@ -147,6 +147,7 @@ export default async function(app, _opts) {
                 // remove leading and trailing spaces
                 Object.keys(row).map(k => row[k] = typeof row[k] == 'string' ? row[k].trim() : row[k]);
                 // hack: to remove middle_name='' entry from the object for easier validation
+                if (!row['employee_id']) delete row['employee_id']
                 if (!row['middle_name']) delete row['middle_name']
                 if (!row['email']) delete row['email']
             }
