@@ -44,8 +44,8 @@ const csvSchema = {
             },
             gender: {
                 type: 'string',
-                enum: ['Male', 'Female', 'Other'],
-                errorMessage: `gender is required and must be 'Male, 'Female', or 'Other'`
+                enum: ['male', 'female', 'other'],
+                errorMessage: `gender is required and must be 'male, 'female', or 'other'`
             }
         },
         additionalProperties: false,
