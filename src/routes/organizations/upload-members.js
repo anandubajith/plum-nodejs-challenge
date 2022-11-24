@@ -1,24 +1,58 @@
+import Ajv from "ajv"
+import addFormats from "ajv-formats"
+import addErrors from 'ajv-errors'
+const ajv = new Ajv({ allErrors: true })
 import csv from 'async-csv'
-import Ajv from 'ajv'
 
-const validateRow = (row) => {
-    const errors = [];
+addErrors(ajv)
+addFormats(ajv, ["email"])
 
-    // validate that employeeId is not duplicated
-
-    if (!row.first_name) {
-        errors.push("Firstname cannot be empty")
+const csvSchema = {
+    type: "array",
+    items: {
+        type: 'object',
+        required: ['employee_id', 'first_name', 'last_name', 'email', 'date_of_birth', 'gender'],
+        properties: {
+            employee_id: {
+                type: 'string',
+                errorMessage: 'employee_id is required'
+            },
+            first_name: {
+                type: 'string',
+                minLength: 3,
+                errorMessage: 'first_name is required and must atleast 3 characters'
+            },
+            middle_name: {
+                type: 'string',
+                minLength: 3,
+                errorMessage: 'middle_name must atleast 3 characters'
+            },
+            last_name: {
+                type: 'string',
+                minLength: 3,
+                errorMessage: 'last_name is required and must atleast 3 characters'
+            },
+            email: {
+                type: 'string',
+                format: 'email',
+                errorMessage: 'email is required and should be valid'
+            },
+            date_of_birth: {
+                type: 'string',
+                pattern: "\\d{2}\/\\d{2}\/\\d{4}",
+                errorMessage: 'date_of_birth is required and should be in dd-MM-yyyy format'
+            },
+            gender: {
+                type: 'string',
+                enum: ['Male', 'Female', 'Other'],
+                errorMessage: `gender is required and must be 'Male, 'Female', or 'Other'`
+            }
+        },
+        additionalProperties: false,
     }
-    if (!row.email) {
-        errors.push("Email cannot be empty")
-    }
-
-    // validate firstname, lastName, middlename(optional) is non empty [ can only contain ' ', alphabets, atleast 3 chars]
-    // validate dob is in dd/mm/yyyy && is in the past
-    // validate gender is in enum [Male, Female, Other] non null
-    //
-    return errors;
 }
+
+const validate = ajv.compile(csvSchema)
 
 const updateRow = async (app, orgId, row) => {
 
@@ -89,7 +123,12 @@ export default async function(app, _opts) {
     }, async (request, reply) => {
 
         try {
+            await app.pg.query('BEGIN');
 
+            const query = `select exists(select 1 from organizations where id=$1)`
+            const { rows: orgResult } = await app.pg.query(query, [request.params.orgId])
+
+            if (!orgResult[0].exists) throw Error("Invalid organization id");
             if (!request.body.file) throw Error("Invalid file");
             if (request.body.file.length != 1) throw Error("Upload only 1 file");
             if (request.body.file[0].mimetype != 'text/csv') throw Error("Invalid mimetype")
@@ -98,19 +137,23 @@ export default async function(app, _opts) {
                 from: 2,
                 columns: ['employee_id', 'first_name', 'middle_name', 'last_name', 'email', 'date_of_birth', 'gender']
             })
+            validate(rows)
+            const ajvErrorList = validate.errors ?? []
+            const indexRegexp = new RegExp(/^\/(\d+)\//) // to extract index out of instancePath
 
-            const errorsList = []
-            const validEntries = []
+            const errorIndices = new Set();
+            const errorsList = ajvErrorList.map(error => {
+                const matches = indexRegexp.exec(error.instancePath)
+                const index = matches[1];
+                errorIndices.add(parseInt(index));
+                return `row = ${index} error = ${error.message}`
+            })
 
-            for (let [rowIndex, row] of rows.entries()) {
-                const errors = validateRow(row);
-                if (errors.length > 0) errorsList.push({ rowIndex, errors });
-                else validEntries.push(row);
-            }
+            const updatePromises = rows.filter((_, index) => !errorIndices.has(index))
+                .map(row => updateRow(app, request.params.orgId, row))
 
-            const updatePromises = validEntries.map(row => updateRow(app, request.params.orgId, row))
             await Promise.all(updatePromises)
-
+            await app.pg.query('COMMIT')
             reply.code(201).send({
                 success: true,
                 upsertCount: updatePromises.length,
@@ -118,6 +161,7 @@ export default async function(app, _opts) {
             });
 
         } catch (e) {
+            await app.pg.query('ROLLBACK')
             reply.code(400).send({ success: false, message: e.message })
         }
     });
