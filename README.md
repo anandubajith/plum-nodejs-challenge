@@ -11,3 +11,5 @@
 ## Stack used
 - [Fastify](https://www.fastify.io/)
 - PostgreSQL
+
+

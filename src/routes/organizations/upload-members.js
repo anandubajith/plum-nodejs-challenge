@@ -11,7 +11,7 @@ const csvSchema = {
     type: "array",
     items: {
         type: 'object',
-        required: ['employee_id', 'first_name', 'last_name', 'email', 'date_of_birth', 'gender'],
+        required: ['employee_id', 'first_name', 'last_name', 'date_of_birth', 'gender'],
         properties: {
             employee_id: {
                 type: 'string',
@@ -145,6 +145,7 @@ export default async function(app, _opts) {
                 row['csv_row'] = index;
                 // hack: to remove middle_name='' entry from the object for easier validation
                 if (!row['middle_name']) delete row['middle_name']
+                if (!row['email']) delete row['email']
             }
 
 

@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS members (
     id serial primary key,
     organization_id bigint not null,
     employee_id varchar(255) not null,
-    email varchar(255) not null,
+    email varchar(255),
     first_name varchar(255) not null,
     middle_name varchar(255),
     last_name varchar(255) not null,
