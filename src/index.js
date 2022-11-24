@@ -36,14 +36,14 @@ try {
     fastify.addSchema({
         $id: 'member',
         type: 'object',
-        required: ['id', 'employee_id', 'first_name', 'middle_name', 'last_name', 'email_id', 'date_of_birth', 'gender'],
+        required: ['id', 'employee_id', 'first_name', 'middle_name', 'last_name', 'email', 'date_of_birth', 'gender'],
         properties: {
             id: { type: 'integer' },
             employee_id: { type: 'integer' },
             first_name: { type: 'string' },
             middle_name: { type: 'string' },
             last_name: { type: 'string' },
-            email_id: { type: 'string' },
+            email: { type: 'string' },
             date_of_birth: { type: 'string' },
             gender: { type: 'string', enum: ["male", "female", "other"] },
         }

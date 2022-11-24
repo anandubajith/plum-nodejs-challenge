@@ -39,10 +39,10 @@ export default async function(app, _opts) {
             const { rows } = await app.pg.query(`
                 SELECT * FROM members WHERE "organization_id" = $1 OFFSET $2 LIMIT $3
             `, [request.params.orgId, offset, size])
-            return reply.code(200).send(rows);
+            return reply.code(200).send({success: true, members: rows});
         } catch (e) {
             console.log(e)
-            return reply.code(400).send({ success: false });
+            return reply.code(400).send({ success: false, message: e.message });
         }
     });
 }
