@@ -6,6 +6,7 @@
 - Update `.env` based on `example.env` with database credentials
 - `npm install`
 - `npm run start`
+- API docs are available at http://localhost:3000/documentation
 
 
 ## TODO
