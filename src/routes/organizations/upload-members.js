@@ -137,6 +137,10 @@ export default async function(app, _opts) {
                 from: 2,
                 columns: ['employee_id', 'first_name', 'middle_name', 'last_name', 'email', 'date_of_birth', 'gender']
             })
+
+            // hack: to remove middle_name='' entry from the object for easier validation
+            for ( let row of rows) if ( !row['middle_name']) delete row['middle_name']
+
             validate(rows)
             const ajvErrorList = validate.errors ?? []
             const indexRegexp = new RegExp(/^\/(\d+)\//) // to extract index out of instancePath
