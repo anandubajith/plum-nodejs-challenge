@@ -6,8 +6,8 @@ export default async function(app, _opts) {
             description: 'To show the list of members paginated',
             security: [{ apiKey: [] }],
             querystring: {
-                page: { type: 'integer' },
-                size: { type: 'integer' }
+                page: { type: 'integer', description: 'page ( default = 0 )' },
+                size: { type: 'integer', description: 'number of items to return ( default = 5)' }
             },
             params: {
                 orgId: { type: 'string' }
@@ -29,7 +29,12 @@ export default async function(app, _opts) {
         },
     }, async (request, reply) => {
         try {
-            const { page, size } = request.query;
+            const query = `select exists(select 1 from organizations where id=$1)`
+            const { rows: orgResult } = await app.pg.query(query, [request.params.orgId])
+            if (!orgResult[0].exists) throw Error("Invalid organization id");
+
+            const page = Math.max(0, request.query.page ?? 0);
+            const size = Math.max(1, request.query.size ?? 5);
             const offset = page * size;
             const { rows } = await app.pg.query(`
                 SELECT * FROM members WHERE "organization_id" = $1 OFFSET $2 LIMIT $3
