@@ -9,15 +9,6 @@ export default async function (fastify, opts) {
         description: 'Backend to handle organizations',
         version: '0.1.1'
       },
-      components: {
-        securitySchemes: {
-          apiKey: {
-            type: 'apiKey',
-            name: 'apiKey',
-            in: 'header'
-          }
-        }
-      }
     },
     hideUntagged: true,
     exposeRoute: true
