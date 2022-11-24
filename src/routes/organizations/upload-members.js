@@ -117,18 +117,7 @@ export default async function(app, _opts) {
                         upsertCount: { type: 'integer', description: 'Count of items updated/inserted' },
                         errors: {
                             type: 'array',
-                            items: {
-                                type: 'object',
-                                properties: {
-                                    rowIndex: { type: 'integer', description: 'Row in which error happened' },
-                                    errors: {
-                                        type: 'array',
-                                        description: 'List of errors in the row',
-                                        items: { type: 'string' }
-                                    }
-                                }
-
-                            }
+                            items: { type: 'string' }
                         }
                     }
                 },
