@@ -11,7 +11,3 @@
 ## Stack used
 - [Fastify](https://www.fastify.io/)
 - PostgreSQL
-
-## TODO
-- update table schemas
-- add constraints in table
