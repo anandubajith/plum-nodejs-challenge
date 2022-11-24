@@ -4,7 +4,6 @@ export default async function(app, _opts) {
             tags: ['Organizations'],
             summary: 'Create organization',
             description: 'To create a new organization',
-            security: [{ apiKey: [] }],
             body: {
                 type: 'object',
                 required: ['name'],

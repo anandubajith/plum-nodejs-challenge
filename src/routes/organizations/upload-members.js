@@ -98,7 +98,6 @@ export default async function(app, _opts) {
         Employee ID,First Name,Middle Name,Last Name,Email ID,Date of Birth,Gender
         1,Richard,,Hendricks,richard.h@gmail.com,01/09/1998,Male
             `,
-            security: [{ apiKey: [] }],
             params: {
                 orgId: { type: 'string' }
             },

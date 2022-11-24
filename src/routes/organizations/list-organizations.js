@@ -4,7 +4,6 @@ export default async function(app, _opts) {
             tags: ['Organizations'],
             summary: 'Organization and basic employee details',
             description: 'To show the list of organisations and basic employee details paginated',
-            security: [{ apiKey: [] }],
             querystring: {
                 page: { type: 'integer', description: 'page ( default = 0 )' },
                 size: { type: 'integer', description: 'number of items to return ( default = 5)' }
