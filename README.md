@@ -8,6 +8,9 @@
 - `npm run start`
 - API docs are available at http://localhost:3000/documentation
 
+## Stack used
+- [Fastify](https://www.fastify.io/)
+- PostgreSQL
 
 ## TODO
 - update table schemas
