@@ -19,18 +19,18 @@ const csvSchema = {
             },
             first_name: {
                 type: 'string',
-                minLength: 3,
-                errorMessage: 'first_name is required and must atleast 3 characters'
+                pattern: '^[A-Za-z ]{3,}',
+                errorMessage: 'first_name is required and must atleast 3 characters (spaces and alphabets only)'
             },
             middle_name: {
                 type: 'string',
-                minLength: 3,
-                errorMessage: 'middle_name must atleast 3 characters'
+                pattern: '^[A-Za-z ]{3,}',
+                errorMessage: 'middle_name must atleast 3 characters (spaces and alphabets only)'
             },
             last_name: {
                 type: 'string',
-                minLength: 3,
-                errorMessage: 'last_name is required and must atleast 3 characters'
+                pattern: '^[A-Za-z ]{3,}',
+                errorMessage: 'last_name is required and must atleast 3 characters (spaces and alphabets only)'
             },
             email: {
                 type: 'string',
@@ -143,6 +143,8 @@ export default async function(app, _opts) {
 
             for (let [index, row] of rows.entries()) {
                 row['csv_row'] = index;
+                // remove leading and trailing spaces
+                Object.keys(row).map(k => row[k] = typeof row[k] == 'string' ? row[k].trim() : row[k]);
                 // hack: to remove middle_name='' entry from the object for easier validation
                 if (!row['middle_name']) delete row['middle_name']
                 if (!row['email']) delete row['email']
