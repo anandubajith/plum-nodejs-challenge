@@ -2,12 +2,12 @@ export default async function(app, _opts) {
     app.get('', {
         schema: {
             tags: ['Organizations'],
-            summary: 'Organization and employee details',
-            description: 'To show the list of organisations and their employee details paginated',
+            summary: 'Organization and basic employee details',
+            description: 'To show the list of organisations and basic employee details paginated',
             security: [{ apiKey: [] }],
             querystring: {
-                page: { type: 'integer' },
-                size: { type: 'integer' }
+                page: { type: 'integer', description: 'page ( default = 0 )' },
+                size: { type: 'integer', description: 'number of items to return ( default = 5)' }
             },
             response: {
                 200: {
@@ -41,7 +41,8 @@ export default async function(app, _opts) {
         },
     }, async (request, reply) => {
         try {
-            const { page, size } = request.query;
+            const page = Math.max(0, request.query.page ?? 0);
+            const size = Math.max(1, request.query.size ?? 5);
             const offset = page * size;
             const { rows } = await app.pg.query(`
                 SELECT
@@ -56,10 +57,11 @@ export default async function(app, _opts) {
                         FROM members m where m."organization_id" = o.id
                     ) as members
                 FROM organizations o OFFSET $1 LIMIT $2
-            `, [offset, size])
-            reply.code(200).send({ success: true, organizations: rows })
+            `, [offset, size]);
+            reply.code(200).send({ success: true, organizations: rows });
         } catch (e) {
-            reply.code(400).send({ success: false, message: e.message })
+            console.error(e);
+            reply.code(400).send({ success: false, message: e.message });
         }
     });
 

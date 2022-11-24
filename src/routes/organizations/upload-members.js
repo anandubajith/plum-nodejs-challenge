@@ -1,4 +1,5 @@
 import csv from 'async-csv'
+import Ajv from 'ajv'
 
 const validateRow = (row) => {
     const errors = [];
@@ -29,7 +30,6 @@ const updateRow = async (app, orgId, row) => {
         row.employee_id, row.first_name, row.middle_name,
         row.last_name, row.email, row.date_of_birth, row.gender
     ])
-
     //todo: insert error?
     // constraint violation?
 }
