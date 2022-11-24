@@ -55,9 +55,21 @@ const validate = ajv.compile(csvSchema)
 
 const updateRow = async (app, orgId, row) => {
     try {
-        const query = `INSERT INTO
-                        members ("organization_id", "employee_id", "first_name", "middle_name", "last_name", "email", "date_of_birth", "gender")
-                        VALUES($1, $2, $3, $4, $5, $6, to_date($7, 'DD/MM/YYYY'), $8) ON CONFLICT ("organization_id", "employee_id") DO NOTHING`
+        const query = `INSERT INTO members (
+                         "organization_id", "employee_id",
+                         "first_name", "middle_name", "last_name",
+                         "email", "date_of_birth", "gender"
+                       )
+                       VALUES ( $1, $2, $3, $4, $5, $6, to_date($7, 'DD/MM/YYYY'), $8)
+                       ON CONFLICT ( "organization_id", "employee_id")
+                       DO UPDATE SET (
+                         "first_name", "middle_name", "last_name",
+                         "email", "date_of_birth", "gender"
+                       ) = (
+                         excluded."first_name", excluded."middle_name", excluded."last_name",
+                         excluded."email", excluded."date_of_birth", excluded."gender"
+                       )
+        `
         const { rowCount } = await app.pg.query(query, [
             orgId,
             row.employee_id, row.first_name, row.middle_name,
