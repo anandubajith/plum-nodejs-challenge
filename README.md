@@ -1,5 +1,13 @@
-TODO:
-- more validations
-     - email id duplication
-     - org + emp_id constraint
-- fix table schemas
+# Org Backend
+
+## Instructions
+- create tables based on `tables.sql`
+> There is an example db running with elephantsql in example.env
+- Update `.env` based on `example.env` with database credentials
+- `npm install`
+- `npm run start`
+
+
+## TODO
+- update table schemas
+- add constraints in table
